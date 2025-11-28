@@ -16,6 +16,9 @@ export { ImageRecognitionService } from './services/ImageRecognitionService'
 // Utils
 export { Logger } from './utils/Logger'
 export { PromptBuilder } from './utils/PromptBuilder'
+export { MarkdownParser } from './utils/MarkdownParser'
+export { ColorPalette, type DoctorTheme } from './utils/ColorPalette'
+export { ImagePickerHelper } from './utils/ImagePickerHelper'
 
 // App Context
 export { AppContext, getAppContext } from './AppContext'
