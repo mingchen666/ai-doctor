@@ -77,6 +77,7 @@ export class LinkedConsultation {
 
 // Discussion message
 export class DiscussionMessage {
+  id: string = ''
   type: string = 'doctor' // 'doctor' | 'patient' | 'system' | 'vote_detail' | 'vote_result'
   author?: string = ''
   content: string = ''

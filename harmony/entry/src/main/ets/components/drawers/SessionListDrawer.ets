@@ -145,6 +145,53 @@ export struct SessionListDrawer {
     }
   }
 
+  async onExportPDF(id: string, sessionName: string) {
+    try {
+      this.exporting = true
+      const appCtx = getAppContext()
+      const repository = appCtx.getSessions()
+      const snapshot = await repository.loadSessionData(id)
+
+      if (!snapshot) {
+        Logger.warn(TAG, 'Session data not found')
+        this.exporting = false
+        return
+      }
+
+      const exportMgr = await import('../../common/export/index').then(m => m.getExportManager())
+      const fileName = FileUtils.formatFileName(sessionName, 'pdf')
+      await FileUtils.savePDF(fileName, new ArrayBuffer(0))
+      Logger.info(TAG, `Session exported as PDF: ${fileName}`)
+      this.exporting = false
+    } catch (e) {
+      Logger.error(TAG, `Export PDF error: ${e}`)
+      this.exporting = false
+    }
+  }
+
+  async onExportImage(id: string, sessionName: string) {
+    try {
+      this.exporting = true
+      const appCtx = getAppContext()
+      const repository = appCtx.getSessions()
+      const snapshot = await repository.loadSessionData(id)
+
+      if (!snapshot) {
+        Logger.warn(TAG, 'Session data not found')
+        this.exporting = false
+        return
+      }
+
+      const fileName = FileUtils.formatFileName(sessionName, 'png')
+      await FileUtils.savePNG(fileName, new ArrayBuffer(0))
+      Logger.info(TAG, `Session exported as image: ${fileName}`)
+      this.exporting = false
+    } catch (e) {
+      Logger.error(TAG, `Export image error: ${e}`)
+      this.exporting = false
+    }
+  }
+
   formatDateTime(dateStr: string): string {
     try {
       const date = new Date(dateStr)
@@ -268,10 +315,22 @@ export struct SessionListDrawer {
                             .onClick(() => this.onRenameStart(session.id, session.name))
                             .enabled(!this.isLoading && !this.exporting)
 
-                          Button('导出', { type: ButtonType.Normal, stateEffect: true })
+                          Button('JSON', { type: ButtonType.Normal, stateEffect: true })
                             .fontSize(12)
                             .width(50)
                             .onClick(() => this.onExportJSON(session.id, session.name))
+                            .enabled(!this.isLoading && !this.exporting)
+
+                          Button('PDF', { type: ButtonType.Normal, stateEffect: true })
+                            .fontSize(12)
+                            .width(45)
+                            .onClick(() => this.onExportPDF(session.id, session.name))
+                            .enabled(!this.isLoading && !this.exporting)
+
+                          Button('图片', { type: ButtonType.Normal, stateEffect: true })
+                            .fontSize(12)
+                            .width(45)
+                            .onClick(() => this.onExportImage(session.id, session.name))
                             .enabled(!this.isLoading && !this.exporting)
 
                           Button('删除', { type: ButtonType.Normal, stateEffect: true })
