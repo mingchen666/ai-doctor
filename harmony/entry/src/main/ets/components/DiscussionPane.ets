@@ -1,5 +1,11 @@
+import { ConsultViewModel, getConsultViewModel } from '../common/stores/ConsultViewModel'
+import { ChatDisplay } from './ChatDisplay'
+
 @Component
 export struct DiscussionPane {
+  @State viewModel: ConsultViewModel = getConsultViewModel()
+  @State patientInput: string = ''
+
   build() {
     Column() {
       // Header for discussion pane
@@ -15,38 +21,11 @@ export struct DiscussionPane {
       .borderBottomColor('#f0f0f0')
       .borderBottomWidth(1)
 
-      // Discussion content area
-      Scroll() {
-        Column() {
-          // Placeholder content for discussion messages
-          Text('欢迎来到医疗会诊系统')
-            .fontSize(14)
-            .fontColor('#8c8c8c')
-            .textAlign(TextAlign.Center)
-            .width('100%')
-            .height(100)
-            .justifyContent(FlexAlign.Center)
-
-          // Additional placeholder items
-          ForEach([1, 2, 3], () => {
-            Column() {
-              Text('医生发言内容')
-                .fontSize(13)
-                .lineHeight(1.5)
-            }
-            .width('100%')
-            .padding(12)
-            .margin({ top: 8 })
-            .backgroundColor('#f5f5f5')
-            .borderRadius(4)
-          })
-        }
-        .width('100%')
-        .padding(12)
-        .gap(8)
-      }
-      .layoutWeight(1)
-      .scrollable(ScrollDirection.Vertical)
+      // Chat display area
+      ChatDisplay({
+        history: this.viewModel.discussionHistory
+      })
+        .layoutWeight(1)
 
       // Input area
       Row() {
@@ -55,12 +34,22 @@ export struct DiscussionPane {
           .height(40)
           .padding({ left: 12, right: 12 })
           .layoutWeight(1)
+          .onChange((value) => {
+            this.patientInput = value
+          })
 
         Button('发送', { type: ButtonType.Normal, stateEffect: true })
-          .backgroundColor('#1890ff')
+          .backgroundColor(this.patientInput.trim() ? '#1890ff' : '#d9d9d9')
           .width(80)
           .height(40)
           .margin({ left: 8 })
+          .enabled(this.patientInput.trim() && this.viewModel.workflow.phase === 'discussion')
+          .onClick(() => {
+            if (this.patientInput.trim()) {
+              this.viewModel.addPatientMessage(this.patientInput)
+              this.patientInput = ''
+            }
+          })
       }
       .width('100%')
       .height(60)

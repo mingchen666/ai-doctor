@@ -517,20 +517,24 @@ export class ConsultViewModel {
 
     const ended = await this.checkEndConditions(result.eliminated)
     if (!ended) {
-      this.resetVotes()
-      this.workflow = new Workflow({
-        ...this.workflow,
-        currentRound: this.workflow.currentRound + 1
-      })
-      this.addSystemMessage(`第 ${this.workflow.currentRound} 轮会诊开始`)
-      this.workflow = new Workflow({
-        ...this.workflow,
-        phase: 'discussion'
-      })
-      this.generateTurnQueue()
-      this.debounceAutoSave()
-      await this.runDiscussionRound()
+      await this.continueToNextRound()
     }
+  }
+
+  async continueToNextRound(): Promise<void> {
+    this.resetVotes()
+    this.workflow = new Workflow({
+      ...this.workflow,
+      currentRound: this.workflow.currentRound + 1
+    })
+    this.addSystemMessage(`第 ${this.workflow.currentRound} 轮会诊开始`)
+    this.workflow = new Workflow({
+      ...this.workflow,
+      phase: 'discussion'
+    })
+    this.generateTurnQueue()
+    this.debounceAutoSave()
+    await this.runDiscussionRound()
   }
 
   async checkEndConditions(eliminated: Doctor | null): Promise<boolean> {
