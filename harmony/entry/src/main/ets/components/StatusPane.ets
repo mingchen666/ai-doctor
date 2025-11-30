@@ -1,10 +1,12 @@
 import { ConsultViewModel, getConsultViewModel } from '../common/stores/ConsultViewModel'
 import { Doctor } from '../common/models/index'
 import { ColorPalette } from '../common/utils/ColorPalette'
+import { getThemeTokens } from '../common/theme/ThemeManager'
 
 @Component
 export struct StatusPane {
   @State viewModel: ConsultViewModel = getConsultViewModel()
+  @State themeTokens = getThemeTokens()
   onOpenSettings?: () => void
 
   getDoctorStatusText(doctor: Doctor): string {
@@ -25,15 +27,15 @@ export struct StatusPane {
 
   getDoctorStatusColor(doctor: Doctor): string {
     if (doctor.status === 'eliminated') {
-      return '#d9d9d9'
+      return this.themeTokens.eliminatedColor
     }
     if (this.viewModel.workflow.activeTurn === doctor.id) {
-      return '#1890ff'
+      return this.themeTokens.activeColor
     }
     if (doctor.votes > 0 && this.viewModel.workflow.phase === 'voting') {
-      return '#52c41a'
+      return this.themeTokens.completedColor
     }
-    return '#faad14'
+    return this.themeTokens.pausedColor
   }
 
   build() {
@@ -48,7 +50,7 @@ export struct StatusPane {
       .height(40)
       .padding({ left: 12, right: 12 })
       .alignItems(VerticalAlign.Center)
-      .borderBottomColor('#f0f0f0')
+      .borderBottomColor(this.themeTokens.borderColor)
       .borderBottomWidth(1)
 
       // Status content area
@@ -66,7 +68,7 @@ export struct StatusPane {
                 .width('40%')
               Text(this.viewModel.patientCase.name || '未设置')
                 .layoutWeight(1)
-                .fontColor(this.viewModel.patientCase.name ? '#262626' : '#8c8c8c')
+                .fontColor(this.viewModel.patientCase.name ? this.themeTokens.textPrimary : this.themeTokens.textSecondary)
             }
             .width('100%')
             .margin({ top: 8 })
@@ -76,7 +78,7 @@ export struct StatusPane {
                 .width('40%')
               Text(this.viewModel.patientCase.age ? String(this.viewModel.patientCase.age) : '未设置')
                 .layoutWeight(1)
-                .fontColor(this.viewModel.patientCase.age ? '#262626' : '#8c8c8c')
+                .fontColor(this.viewModel.patientCase.age ? this.themeTokens.textPrimary : this.themeTokens.textSecondary)
             }
             .width('100%')
             .margin({ top: 4 })
@@ -86,14 +88,14 @@ export struct StatusPane {
                 .width('40%')
               Text(this.viewModel.patientCase.gender || '未设置')
                 .layoutWeight(1)
-                .fontColor(this.viewModel.patientCase.gender ? '#262626' : '#8c8c8c')
+                .fontColor(this.viewModel.patientCase.gender ? this.themeTokens.textPrimary : this.themeTokens.textSecondary)
             }
             .width('100%')
             .margin({ top: 4 })
           }
           .width('100%')
           .padding(12)
-          .backgroundColor('#f5f5f5')
+          .backgroundColor(this.themeTokens.backgroundSecondary)
           .borderRadius(4)
           .margin({ bottom: 12 })
 
@@ -116,10 +118,11 @@ export struct StatusPane {
                   Text(doctor.name)
                     .margin({ left: 8 })
                     .layoutWeight(1)
+                    .fontColor(this.themeTokens.textPrimary)
 
                   Text(this.getDoctorStatusText(doctor))
                     .fontSize(12)
-                    .fontColor('#8c8c8c')
+                    .fontColor(this.themeTokens.textSecondary)
                 }
                 .width('100%')
                 .height(32)
@@ -131,7 +134,7 @@ export struct StatusPane {
           }
           .width('100%')
           .padding(12)
-          .backgroundColor('#f5f5f5')
+          .backgroundColor(this.themeTokens.backgroundSecondary)
           .borderRadius(4)
 
           // Display final summary if available
@@ -145,14 +148,14 @@ export struct StatusPane {
 
               Text(this.viewModel.finalSummary.content)
                 .fontSize(12)
-                .fontColor('#262626')
+                .fontColor(this.themeTokens.textPrimary)
                 .lineHeight(1.5)
                 .maxLines(5)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
             .width('100%')
             .padding(12)
-            .backgroundColor('#f0f5ff')
+            .backgroundColor(this.themeTokens.primaryColorLight)
             .borderRadius(4)
             .margin({ top: 12 })
           }
@@ -169,7 +172,7 @@ export struct StatusPane {
         if (this.viewModel.workflow.phase === 'setup') {
           Button('开始会诊', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#1890ff')
+            .backgroundColor(this.themeTokens.primaryColor)
             .onClick(async () => {
               try {
                 await this.viewModel.startConsultation()
@@ -182,14 +185,14 @@ export struct StatusPane {
           Row() {
             Button(this.viewModel.workflow.paused ? '继续' : '暂停', { type: ButtonType.Normal, stateEffect: true })
               .layoutWeight(1)
-              .backgroundColor(this.viewModel.workflow.paused ? '#52c41a' : '#faad14')
+              .backgroundColor(this.viewModel.workflow.paused ? this.themeTokens.completedColor : this.themeTokens.pausedColor)
               .onClick(() => {
                 this.viewModel.togglePause()
               })
 
             Button('完成轮次', { type: ButtonType.Normal, stateEffect: true })
               .layoutWeight(1)
-              .backgroundColor('#1890ff')
+              .backgroundColor(this.themeTokens.primaryColor)
               .margin({ left: 8 })
               .onClick(async () => {
                 try {
@@ -204,7 +207,7 @@ export struct StatusPane {
         } else if (this.viewModel.workflow.phase === 'voting') {
           Button('继续下一轮', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#1890ff')
+            .backgroundColor(this.themeTokens.primaryColor)
             .onClick(async () => {
               try {
                 await this.viewModel.continueToNextRound()
@@ -215,7 +218,7 @@ export struct StatusPane {
 
           Button('生成总结', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#52c41a')
+            .backgroundColor(this.themeTokens.completedColor)
             .margin({ top: 8 })
             .onClick(async () => {
               try {
@@ -227,14 +230,30 @@ export struct StatusPane {
         } else if (this.viewModel.workflow.phase === 'finished') {
           Button('查看总结', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#1890ff')
+            .backgroundColor(this.themeTokens.primaryColor)
             .onClick(() => {
               // Final summary is shown in the status content area
             })
 
+          Button('导出 PDF', { type: ButtonType.Normal, stateEffect: true })
+            .width('100%')
+            .backgroundColor(this.themeTokens.completedColor)
+            .margin({ top: 8 })
+            .onClick(() => {
+              // Export PDF - will be connected to export functionality
+            })
+
+          Button('导出图片', { type: ButtonType.Normal, stateEffect: true })
+            .width('100%')
+            .backgroundColor(this.themeTokens.warningColor)
+            .margin({ top: 8 })
+            .onClick(() => {
+              // Export image - will be connected to export functionality
+            })
+
           Button('问诊设置', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#1890ff')
+            .backgroundColor(this.themeTokens.primaryColor)
             .margin({ top: 8 })
             .onClick(() => this.onOpenSettings?.())
         }
@@ -242,7 +261,7 @@ export struct StatusPane {
         if (this.viewModel.workflow.phase === 'setup') {
           Button('问诊设置', { type: ButtonType.Normal, stateEffect: true })
             .width('100%')
-            .backgroundColor('#1890ff')
+            .backgroundColor(this.themeTokens.primaryColor)
             .margin({ top: 8 })
             .onClick(() => this.onOpenSettings?.())
         }
@@ -250,17 +269,17 @@ export struct StatusPane {
       .width('100%')
       .padding(12)
       .gap(0)
-      .backgroundColor('#fafafa')
-      .borderTopColor('#f0f0f0')
+      .backgroundColor(this.themeTokens.backgroundTertiary)
+      .borderTopColor(this.themeTokens.borderColor)
       .borderTopWidth(1)
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#ffffff')
+    .backgroundColor(this.themeTokens.backgroundPrimary)
     .borderRadius(4)
     .border({
       width: 1,
-      color: '#f0f0f0',
+      color: this.themeTokens.borderColor,
       radius: 4
     })
   }

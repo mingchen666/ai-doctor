@@ -1,12 +1,14 @@
 import { DiscussionMessage } from '../common/models/index'
 import { MarkdownParser } from '../common/utils/MarkdownParser'
 import { ColorPalette } from '../common/utils/ColorPalette'
+import { getThemeTokens } from '../common/theme/ThemeManager'
 
 @Component
 export struct ChatDisplay {
   @Prop history: DiscussionMessage[] = []
   @State scrollController: Scroller = new Scroller()
   @State shouldAutoScroll: boolean = true
+  @State themeTokens = getThemeTokens()
 
   onAppear() {
     this.autoScrollToBottom()
@@ -54,13 +56,13 @@ export struct ChatDisplay {
     Row() {
       Text(item.content)
         .fontSize(13)
-        .fontColor(ColorPalette.SYSTEM_COLOR)
+        .fontColor(this.themeTokens.textSecondary)
         .textAlign(TextAlign.Center)
     }
     .width('100%')
     .height(40)
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(ColorPalette.SYSTEM_BG)
+    .backgroundColor(this.themeTokens.systemMessageBg)
     .margin({ top: 8, bottom: 8, left: 12, right: 12 })
     .borderRadius(4)
   }
@@ -93,15 +95,15 @@ export struct ChatDisplay {
 
         Text(MarkdownParser.parseToText(item.content || ''))
           .fontSize(13)
-          .fontColor('#262626')
+          .fontColor(this.themeTokens.textPrimary)
           .lineHeight(1.5)
       }
       .layoutWeight(1)
       .padding(12)
-      .backgroundColor(ColorPalette.getBubbleColor(item.doctorId || ''))
+      .backgroundColor(this.themeTokens.doctorMessageBg)
       .border({
         width: 1,
-        color: ColorPalette.getBorderColor(item.doctorId || '')
+        color: this.themeTokens.primaryColorLight
       })
       .borderRadius(8)
     }
@@ -119,22 +121,22 @@ export struct ChatDisplay {
       Column() {
         Text(item.author || '患者')
           .fontSize(13)
-          .fontColor(ColorPalette.PATIENT_TEXT_COLOR)
+          .fontColor(this.themeTokens.secondaryColor)
           .fontWeight(FontWeight.Bold)
           .margin({ bottom: 4 })
 
         Text(MarkdownParser.parseToText(item.content || ''))
           .fontSize(13)
-          .fontColor(ColorPalette.PATIENT_TEXT_COLOR)
+          .fontColor(this.themeTokens.textPrimary)
           .lineHeight(1.5)
       }
       .layoutWeight(1)
       .maxWidth('80%')
       .padding(12)
-      .backgroundColor(ColorPalette.PATIENT_BUBBLE_COLOR)
+      .backgroundColor(this.themeTokens.patientMessageBg)
       .border({
         width: 1,
-        color: ColorPalette.PATIENT_BORDER_COLOR
+        color: this.themeTokens.secondaryColorLight
       })
       .borderRadius(8)
       .margin({ left: 24 })
@@ -148,7 +150,7 @@ export struct ChatDisplay {
       }
       .width(36)
       .height(36)
-      .backgroundColor('#1890ff')
+      .backgroundColor(this.themeTokens.primaryColor)
       .borderRadius(18)
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
@@ -168,13 +170,13 @@ export struct ChatDisplay {
         .fontColor('#ffffff')
         .fontWeight(FontWeight.Bold)
         .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-        .backgroundColor(ColorPalette.VOTE_BADGE_COLOR)
+        .backgroundColor(this.themeTokens.warningColor)
         .borderRadius(3)
         .margin({ right: 8 })
 
       Text(`${item.voterName || ''} 标注 ${item.targetName || ''} 为不太准确: ${item.reason || ''}`)
         .fontSize(12)
-        .fontColor('#8c8c8c')
+        .fontColor(this.themeTokens.textSecondary)
         .lineHeight(1.5)
     }
     .width('100%')
@@ -186,13 +188,13 @@ export struct ChatDisplay {
     Row() {
       Text(item.content || '')
         .fontSize(13)
-        .fontColor(ColorPalette.SYSTEM_COLOR)
+        .fontColor(this.themeTokens.textSecondary)
         .textAlign(TextAlign.Center)
     }
     .width('100%')
     .height(40)
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(ColorPalette.SYSTEM_BG)
+    .backgroundColor(this.themeTokens.systemMessageBg)
     .margin({ top: 8, bottom: 8, left: 12, right: 12 })
     .borderRadius(4)
   }

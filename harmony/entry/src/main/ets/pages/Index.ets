@@ -7,6 +7,7 @@ import { GlobalSettingsModal } from '../components/modals/GlobalSettingsModal'
 import { ConsultationSettingsModal } from '../components/modals/ConsultationSettingsModal'
 import { SessionListDrawer } from '../components/drawers/SessionListDrawer'
 import { ConsultViewModel, getConsultViewModel } from '../common/stores/ConsultViewModel'
+import { getThemeTokens } from '../common/theme/ThemeManager'
 
 @Entry
 @Component
@@ -15,6 +16,7 @@ struct Index {
   @State consultationSettingsOpen: boolean = false
   @State sessionsOpen: boolean = false
   @State viewModel: ConsultViewModel = getConsultViewModel()
+  @State themeTokens = getThemeTokens()
 
   build() {
     Column() {
@@ -70,7 +72,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#ffffff')
+    .backgroundColor(this.themeTokens.backgroundPrimary)
 
     // Modals and drawers
     if (this.globalSettingsOpen) {
